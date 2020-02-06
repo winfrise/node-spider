@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>spider video</title>
+  <script src="/js/vue.js"></script>
+  <script src="/js/axios.js"></script>
+  <style>
+    .row {
+      padding: 10px 0;
+    }
+    .input-url {
+      display: block;
+      width: 600px;
+      height: 30px;
+    }
+    .btn {
+      width: 100px;
+      height: 30px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="logo">爬取视频</h1>
+  </header>
+
+  <div id="app">
+    <div class="row">
+      <input class="input-url" type="text" placeholder="请输入地址" v-model="url">
+    </div>
+
+    <div class="row">
+      <label><input type="radio" v-model="type" value="img">图片</label>
+      <label><input type="radio" v-model="type" value="video">视频</label>
+
+    </div>
+
+    <div class="row">
+      <button type="button" class="add-rule-btn" @click="addRule">添加规则</button>
+    </div>
+
+    <div class="row">
+      <ul class="rule-list">
+        <li class="rule-item" v-for="(item, index) in rules">
+          <span>{{index+1}}</span>
+          <input type="text" v-model="item.parent">
+        </li>
+      </ul>
+    </div>
+
+    <button class="btn" type="button" @click="previewPage">预览页面</button>
+    <button class="btn" type="button" @click="getVideoUrl">获取视频</button>
+    <button class="btn" type="button" @click="submit">提交</button>
+    <button class="btn" type="button" @click="downloadAll">下载全部</button>
+
+    <hr>
+    <iframe ref="previewPageIframe" :src="previewPageUrl" width="640" height="1000"></iframe>
+    <ul class="img-list">
+      <li class="img-item" v-for="(item) in result">
+        <img width="400" :src="item.src" />
+      </li>
+    </ul>
+  </div>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        url: 'https://w.3huase.com/video/view/1157874', //'https://www.meizitu.com/a/5521.html',
+        previewPageUrl: '', // 预览页面地址
+        rules: [],
+        type: 'video',
+        docHtml: '',
+        result: []
+      },
+      methods: {
+        /**
+         *  添加规则
+         */
+        addRule () {
+          let rule = {
+            parent: ''
+          }
+          this.rules.push(rule)
+        },
+        /**
+         * 预览页面
+         */
+        previewPage () {
+          this.previewPageUrl = this.url
+        },
+        /**
+         * 获取视频地址
+         */
+        getVideoUrl () {
+          let iframe = this.$refs.previewPageIframe
+          let iframeDocument = iframe.contentWindow.document
+          console.log(iframeDocument)
+        },
+        /**
+         * 提交信息
+         */
+        submit () {
+          let data = {
+            url: this.url,
+            rules: this.rules,
+            type: this.type
+          }
+          axios.post('/api/spider-video', data)
+            .then(res => {
+            this.docHtml = res.data.data.docHtml
+             this.result = res.data.data.result
+            })
+            .catch(function (error) {
+              console.log('err')
+              console.log(error);
+            });
+        },
+        downloadAll () {
+          this.result.forEach(async item => {
+            let data = {
+              fileName: item.fileName,
+              savePath: '/Users/fanwenxiang/Downloads/spider-pic-temp', // TODO:需要创建文件夹
+              src: item.src
+            }
+            console.log(data)
+            await axios.post('/api/download-picture', data)
+          })
+        }
+      }
+    })
+  </script>
+</body>
+</html>

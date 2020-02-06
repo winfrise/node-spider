@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>嗅探图片</title>
+  <script src="/js/vue.js"></script>
+  <script src="/js/axios.js"></script>
+  <style>
+    .input {
+      width: 500px;
+      height: 50px;
+    }
+
+    .pic-list {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .pic-item {
+      width: 350px;
+      height: 600px;
+      margin: 10px;
+    }
+    .pic-item .img-box img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .pic-item .img-info .link {
+      word-break: break-all
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <head>
+      <h1>嗅探图片</h1>
+    </head>
+    <main>
+      <h2>图片地址</h2>
+
+      <div>
+        <input type="text" v-model="url" class="input">
+
+        <div>
+          startNum: <input type="text" v-model="startNum" >
+
+          endNum: <input type="text" v-model="endNum">
+  
+          step: <input type="text" v-model="step">
+        </div>
+      </div>
+
+      <div>
+        <button type="button" @click="generateUrl">生成地址</button>
+        <button type="button" @click="sniffe">开始嗅探</button>
+        <button type="button" @click="toggleShowPicture">{{ isShowPicture ? '链接' : '图片'}}显示</button>
+      </div>
+
+      <div>
+        <div>过滤</div>
+        <label><input type="checkbox" value="404"> 全部</label>
+        <label><input type="checkbox" value="404"> 404</label>
+        <label><input type="checkbox" value="200"> 200</label>
+      </div>
+
+      <div>
+        <ul class="pic-list" v-if="isShowPicture">
+          <li class="pic-item" v-for="item in urlArr" v-show="item.status !== 404">
+            <div class="img-box">
+              <img class="img" :src="item.url">
+            </div>
+            <div class="img-info">
+              <p class="link">{{item.url}}</p>
+              <p class="status">状态：{{item.status}}</p>
+            </div>
+          </li>
+        </ul>
+
+        <ul v-else class="link-list">
+          <li v-for="item in urlArr">
+            {{item.url}}
+            <span>{{item.status}}</span>
+            <a :href="item.url">跳转</a>
+          </li>
+        </ul>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        url: 'https://pic.zhifuok.com/qq32593992/jinghuaban/shenghuozhao/a/180/${num}.jpg',
+        startNum: 0,
+        endNum: 10,
+        step: 1,
+        urlArr: [],
+        isShowPicture: false
+      },
+      methods: {
+        toggleShowPicture () {
+          this.isShowPicture = !this.isShowPicture
+        },
+        /**
+         * 生成图片地址
+         */
+        generateUrl () {
+          let {startNum, endNum, step} = this
+          startNum = Number(startNum)
+          endNum = Number(endNum)
+          step = Number(step)
+          for (let num = startNum; num <= endNum; num+= step) {
+            this.urlArr.push({
+              url: this.url.replace('${num}', num),
+              status: 0
+            })
+          }
+        },
+        /**
+         * 嗅探地址状态
+         */
+        async sniffe () {
+          let i, len = this.urlArr.length
+          for (let i = 0; i < len; i++ ) {
+            await axios.get(this.urlArr[i].url)
+              .then(res => {
+                this.urlArr[i].status = res.status
+              })
+              .catch(err => {
+                this.urlArr[i].status = 404
+              })
+
+          }
+        }
+      }
+    })
+  </script>
+</body>
+</html>

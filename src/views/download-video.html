@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>download video</title>
+  <script src="/js/vue.js"></script>
+  <script src="/js/axios.js"></script>
+  <style>
+    .input {
+      width: 500px;
+      height: 50px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>下载视频</h1>
+    </header>
+
+    <main>
+      <div>
+        视频地址：<input type="text" class="input" :value="videoSrc">
+      </div>
+
+      <div>
+        保存中径：<input type="text" class="input" :value="savePath">
+      </div>
+
+      <div>
+        文件名称：<input type="text" class="input" :value="fileName">
+      </div>
+
+      <div>
+        <button type="button" @click="download">下载视频</button>
+      </div>
+    </main>
+  </div>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        videoSrc: 'http://www.170mv.com/tool/jiexi/ajax/pid/13301/vid/3381132.mp4',
+        savePath: '/Users/fanwenxiang/Downloads/',
+        fileName: 'testVideo.mp4'
+      },
+      methods: {
+        download () {
+          const data = {
+            videoSrc: this.videoSrc,
+            savePath: this.savePath,
+            fileName: this.fileName
+          }
+          axios.post('/api/download-video', data)
+            .then(res => {
+              console.log(res)
+            })
+            .catch(err => {
+              alert(err.message)
+            })
+        }
+      }
+    })
+  </script>
+</body>
+</html>

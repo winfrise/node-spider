@@ -1,0 +1,29 @@
+{
+  "name": "node-server",
+  "version": "1.0.0",
+  "description": "### 准备工作",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@koa/router": "^8.0.6",
+    "cheerio": "^1.0.0-rc.3",
+    "ejs": "^3.0.1",
+    "element-ui": "^2.13.0",
+    "iconv-lite": "^0.5.1",
+    "koa": "^2.11.0",
+    "koa-bodyparser": "^4.2.1",
+    "koa-static": "^5.0.0",
+    "koa-views": "^6.2.1",
+    "puppeteer": "^2.1.1"
+  },
+  "devDependencies": {
+    "axios": "^0.19.2",
+    "vue": "^2.6.11"
+  }
+}

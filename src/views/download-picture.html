@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>download picture</title>
+  <script src="/js/vue.js"></script>
+  <script src="/js/axios.js"></script>
+  <style>
+    .row {
+      padding: 10px 0;
+    }
+    .input-url {
+      display: block;
+      width: 600px;
+      height: 30px;
+    }
+    .btn {
+      width: 100px;
+      height: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1>download Picture</h1>
+  <div id="app">
+    <div class="row">
+      <input class="input-url" type="text" placeholder="请输入地址" v-model="url">
+    </div>
+
+    <button class="btn" type="button" @click="submit">提交</button>
+  </div>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        url: 'https://www.meizitu.com/a/5521.html'
+      },
+      methods: {
+        submit () {
+          let params = {
+            url: this.url
+          }
+          axios.get('/api/spider-page', {
+            params
+          })
+            .then(function (response) {
+              console.log(response);
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+        }
+      }
+    })
+  </script>
+</body>
+</html>

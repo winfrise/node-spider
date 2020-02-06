@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>puppetter</title>
+  <script src="/js/vue.js"></script>
+  <script src="/js/axios.js"></script>
+  <style>
+    html, body, div, p,
+    h1, h2, h3, h4, h5, h6 {
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      list-style: none;
+    }
+    .input {
+      width: 500px;
+      height: 50px;;
+    }
+    .list {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .item {
+      width: 200px;
+      height: 300px;
+      margin: 10px;
+      border: 1px solid #ccc;
+      background: #eee;
+    }
+    .item .pic {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 200px;
+      height: 200px;
+    }
+    .item .pic img {
+      display: block;
+      max-width: 200px;
+      max-height: 200px;
+    }
+    .item .info {
+
+    }
+    .item .info .link {
+      word-break: break-all;
+    }
+    .item .info .alt {
+
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Puppetter</h1>
+    </header>
+
+    <main>
+      <div>
+        <input type="text" class="input"  v-model="url">
+      </div>
+
+      <div>
+        <button type="button" class="btn" @click="submit">提交</button>
+      </div>
+
+      <hr>
+      <div>
+        <label>
+          <input type="checkbox" @change="handleCheckAll">全选
+        </label>
+        <label>
+          <input type="checkbox" @change="handleinverseCheck">反选
+        </label>
+
+        <button type="button" type="button" @click="download(checkList)">下载图片</button>
+      </div>
+
+      <div>
+        <ul class="list">
+          <li v-for="item in imgs" class="item">
+            <div class="pic">
+              <img :src="item.src" :alt="item.alt">
+            </div>
+            <div class="info">
+              <p class="link"><span>图片链接：</span>{{item.src}}</p>
+              <p class="alt"><span>alt：</span>{{item.alt}}</p>
+            </div>
+            <input type="checkbox" v-model="checkList" :value="item.src">
+            <button type="button" @click="download(item.src)">下载</button>
+          </li>
+        </ul>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        url: 'https://www.jiepaiyes.com/index.php?hmsr=app&hmpl=&hmcu=&hmkw=&hmci=',
+        imgs: [],
+        checkList: []
+      },
+      methods: {
+        handleCheckAll (e) {
+          if (e.target.checked) {
+            this.checkList = this.imgs.map(img => img.src)
+          } else {
+            this.checkList = []
+          }
+        },
+        handleinverseCheck () {
+          let inverse = []
+          this.imgs.forEach(img => {
+            if (!this.checkList.includes(img.src)) {
+              inverse.push(img.src)
+            }
+          })
+          this.checkList = inverse
+        },
+        download (imgs) {
+          axios.post('/api/download-picture', {
+            imgs,
+            savePath: '/Users/fanwenxiang/Downloads/spider-pic-temp'
+          })
+            .then(res => {
+              console.log(res)
+            })
+        },
+        submit () {
+          const {url} = this
+          let data = {
+            url
+          }
+          axios.post('/api/puppetter', data)
+            .then(res => {
+              this.imgs = res.data.data.imgs
+            })
+            .catch(err => {
+              console.log('err', err)
+            })
+        }
+      }
+    })
+  </script>
+</body>
+</html>

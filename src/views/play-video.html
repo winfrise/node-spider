@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="/js/vue.js"></script>
+  <script src="/js/axios.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <title></title>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>播放视频</h1>
+    </header>
+  
+    <main>
+      <div>
+        <input type="text"  v-model="videoUrl" >
+      </div>
+
+      <div>
+        <button type="button" @click="playVideo">播放视频</button>
+      </div>
+
+      <div>
+      <video  ref="video" controls></video>
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    console.log(Hls.Events)
+    new Vue({
+      el: '#app',
+      data: {
+        videoUrl: 'https://v.vyaos.com/hls/f4cd02670a634f70a14d930470d7d157/index.m3u8',
+        videoSrc: ''
+      },
+      methods: {
+        playVideo () {
+          let video = this.$refs.video
+          let videoUrl = this.videoUrl
+
+            if(Hls.isSupported()) {
+              var hls = new Hls();
+              hls.loadSource(videoUrl);
+
+              hls.attachMedia(video);
+              // hls.on(Hls.Events.MANIFEST_PARSED,function() {
+              //   video.play();
+              // });
+          }
+        }
+      }
+    })
+  </script>
+</body>
+</html>
