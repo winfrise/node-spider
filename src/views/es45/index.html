@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>es45</title>
+  <script src="/js/vue.js"></script>
+  <script src="/js/axios.js"></script>
+</head>
+<body>
+
+<div id="app">
+  <header>
+    <h1>es45.com</h1>
+  </header>
+
+  <main>
+    <button type="button" @click="start">开始</button>
+  </main>
+</div>
+
+<script>
+
+  new Vue({
+    el: '#app',
+    methods: {
+      start () {
+        axios.post('/api/es45/start')
+          .then(res => {
+            console.log(res)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      }
+    }
+  })
+</script>
+  
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>掘金</title>
+  <script src="/js/vue.js"></script>
+  <script src="/js/axios.js"></script>
+</head>
+<body>
+
+<div id="app">
+  <header>
+    <h1>掘金</h1>
+  </header>
+
+  <main>
+    <div>
+      <div>
+        <label>
+          <input type="checkbox">任务完成后关闭浏览器窗口
+        </label>
+      </div>
+      <button class="btn" type="button" @click="start">开始</button>
+    </div>
+    <div>
+      <div>登录信息</div>
+      <div>
+        <input class="username" type="text" placeholder="用户名" v-model="username">
+        <input class="password" type="text" placeholder="密码" v-model="password">
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+
+  new Vue({
+    el: '#app',
+    data: {
+      username: '',
+      password: ''
+    },
+    methods: {
+      start () {
+        let { username, password} = this
+        axios.post('/api/juejin/start', {
+          username,
+          password
+        })
+          .then(res => {
+            console.log(res)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      }
+    }
+  })
+</script>
+  
+</body>
+</html>

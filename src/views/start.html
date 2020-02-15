@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>开始</title>
+  <script src="/js/vue.js"></script>
+  <script src="/js/axios.js"></script>
+  <style>
+    html, body, div, p,ul, li,
+    h1, h2, h3, h4, h5, h6 {
+      margin: 0;
+      padding: 0;
+    }
+    li {
+      list-style: none;
+    }
+
+    #app {
+      margin: 0 30px;
+    }
+    .row {
+      padding: 10px 0;
+    }
+    .input-url {
+      display: block;
+      width: 600px;
+      height: 30px;
+    }
+    .btn {
+      width: 100px;
+      height: 30px;
+    }
+    .ist {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>地址生成</h1>
+    </header>
+  
+    <main>
+      <div class="row">
+        网址：<input class="input-url" type="text" placeholder="请输入地址" v-model="url">
+      </div>
+
+      <div class="row">
+        <span>startNum: <input type="text" v-model="startNum" ></span>
+
+        <span>endNum: <input type="text" v-model="endNum"></span>
+
+        <span>step: <input type="text" v-model="step"></span>
+
+        <button type="button" @click="generateUrl">生成地址</button>
+
+        <!-- <button type="button" @click="sniffeUrl">嗅探地址</button> -->
+        <button type="button" @click="getLink">获取地址</button>
+
+      </div>
+  
+
+  
+  
+      <hr>
+
+      <div>
+        <span>共{{urls.length}}</span>
+      </div>
+
+      <ul class="list">
+        <li class="item" v-for="(item, index) in urls">
+          <span>({{index+1}})</span>
+          <a :href="item.url" target="_blank">{{item.url}}</a>
+          <span>{{item.status}}</span>
+        </li>
+      </ul>
+    </main>
+  </div>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        url: 'https://www.meizitu.com/a/list_1_${num}.html', //'https://www.meizitu.com/a/5521.html',
+        urls: [],
+        startNum: 1,
+        step: 1,
+        endNum: 2,
+        result: []
+      },
+      mounted () {
+
+      },
+      methods: {
+        /**
+         * 生成地址
+         */
+        generateUrl () {
+          let {startNum, endNum, step} = this
+          startNum = Number(startNum)
+          endNum = Number(endNum)
+          step = Number(step)
+          for (let num = startNum; num <= endNum; num+= step) {
+            this.urls.push({
+              url: this.url.replace('${num}', num),
+              status: 0
+            })
+          }
+        },
+        /**
+         * 嗅探地址状态
+         * TODO: 有跨域问题
+         */
+        async sniffeUrl () {
+          let i, len = this.urls.length
+          for (let i = 0; i < len; i++ ) {
+            await axios.get(this.urls[i].url)
+              .then(res => {
+                this.urls[i].status = res.status
+              })
+              .catch(err => {
+                this.urls[i].status = 404
+              })
+
+          }
+        },
+        async getLink () {
+          for (let i = 0, l = this.urls.length; i < l; i++) {
+            let data = {
+              url: this.urls[i].url,
+              container: '.list',
+              goal: {
+                elem: 'a',
+                prop: 'src'
+              }
+            }
+            axios.post('/api/spider-page', data)
+              .then(res => {
+                console.log(res)
+              this.result = res.data.data.result
+              })
+              .catch(function (error) {
+                console.log('err')
+                console.log(error);
+              });
+          }
+        },
+        downloadAll () {
+          this.result.forEach(async item => {
+            let data = {
+              fileName: item.fileName,
+              savePath: '/Users/fanwenxiang/Downloads/spider-pic-temp', // TODO:需要创建文件夹
+              src: item.src
+            }
+            console.log(data)
+            await axios.post('/api/download-picture', data)
+          })
+        }
+      }
+    })
+  </script>
+</body>
+</html>
