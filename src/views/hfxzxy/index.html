@@ -25,7 +25,9 @@
     el: '#app',
     methods: {
       start () {
-        axios.post('/api/hfxzxy/start')
+        axios.post('/api/hfxzxy/start', {
+          savePath: '/Users/fanwenxiang/Downloads/spider-pic-temp'
+        })
           .then(res => {
             console.log(res)
           })

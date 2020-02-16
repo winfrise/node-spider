@@ -1,8 +1,22 @@
 const axios = require('axios')
 const fs = require('fs')
 const http = require('http')
+const path  = require('path')
 
 module.exports = {
+  // 新建保存视频的文件夹
+  mkdirSaveFolder: function mkdirSaveFolder (dirname) {
+    if (!fs.existsSync(dirname)) {
+
+      if (mkdirSaveFolder(path.dirname(dirname))) {
+        fs.mkdirSync(dirname);
+        return true;
+      }
+      return false
+    } else {
+      return true
+    }
+  },
   /**
    * 下载图片
    * @param {*} imageSrc 
